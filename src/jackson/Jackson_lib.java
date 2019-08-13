@@ -104,5 +104,4 @@ public class Jackson_lib {
 		if(param == 0) return 100;
 		else return - Math.log(1 - rnd.nextDouble()) / param;
 	}
-	
 }
