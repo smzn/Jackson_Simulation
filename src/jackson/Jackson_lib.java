@@ -1,5 +1,6 @@
 package jackson;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -7,6 +8,7 @@ public class Jackson_lib {
 	private int N, time;
 	private double p[][], lambda[], mu[];
 	Random rnd = new Random();
+	ArrayList<Integer> queuelength[]; //全てのノードを順番に入れていく
 	
 	public Jackson_lib(int n, int time, double[][] p, double[] lambda, double[] mu) {
 		N = n;
@@ -14,6 +16,8 @@ public class Jackson_lib {
 		this.p = p;
 		this.lambda = lambda;
 		this.mu = mu;
+		queuelength = new ArrayList[N];
+		for(int i = 0; i < queuelength.length; i++) queuelength[i] = new ArrayList<Integer>();
 	}
 
 	public double[] getSimulation() {
@@ -21,7 +25,7 @@ public class Jackson_lib {
 		double arrival[] = new double[N];
 		double service[] = new double[N];
 		double total_queue[] = new double[N]; //延べ系内人数
-		double queue[] = new double[N]; //現在の系内人数(サービス中も含む)
+		int queue[] = new int[N]; //現在の系内人数(サービス中も含む)
 		double min_arrival, min_service;
 		int arrival_index, service_index;
 		double sum_p,dep_p;
@@ -61,6 +65,7 @@ public class Jackson_lib {
 				arrival[arrival_index] = this.getExponential(lambda[arrival_index]);
 				elapse += min_arrival;
 				System.out.println("Index = "+ arrival_index);
+				for(int i = 0; i < N; i++) queuelength[i].add(queue[i]);
 			}
 			else if(min_arrival >= min_service ){ //退去が発生
 				System.out.println("Departure");
@@ -75,6 +80,7 @@ public class Jackson_lib {
 				
 				elapse += min_service;
 				System.out.println("Index = "+ service_index);
+				for(int i = 0; i < N; i++) queuelength[i].add(queue[i]);
 				//退去する客の行き先決定
 				sum_p = 0;
 				dep_p = rnd.nextDouble();
@@ -96,6 +102,11 @@ public class Jackson_lib {
 			System.out.println("Simulation : Arrival = "+Arrays.toString(arrival));
 			System.out.println("Simulation : Service = "+Arrays.toString(service));
 		}
+		//グラフ描画
+		Graph graph = new Graph(queuelength,N);
+		graph.setBounds(5,5,1000,600);
+		graph.setVisible(true);
+		
 		for(int i = 0; i < N; i++) total_queue[i] = total_queue[i] / time;
 		return total_queue;
 	}
@@ -104,4 +115,6 @@ public class Jackson_lib {
 		if(param == 0) return 100;
 		else return - Math.log(1 - rnd.nextDouble()) / param;
 	}
+	
+	
 }
