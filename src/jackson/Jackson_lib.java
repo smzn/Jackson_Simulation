@@ -6,9 +6,9 @@ import java.util.Random;
 
 public class Jackson_lib {
 	private int N, time;
-	private double p[][], lambda[], mu[];
+	private double p[][], lambda[], mu[], alpha[];
 	Random rnd = new Random();
-	ArrayList<Integer> queuelength[]; //全てのノードを順番に入れていく
+	ArrayList<Integer> queuelength[]; 
 	
 	public Jackson_lib(int n, int time, double[][] p, double[] lambda, double[] mu) {
 		N = n;
@@ -18,6 +18,7 @@ public class Jackson_lib {
 		this.mu = mu;
 		queuelength = new ArrayList[N];
 		for(int i = 0; i < queuelength.length; i++) queuelength[i] = new ArrayList<Integer>();
+		alpha = new double[N];
 	}
 
 	public double[] getSimulation() {
@@ -66,6 +67,7 @@ public class Jackson_lib {
 				elapse += min_arrival;
 				System.out.println("Index = "+ arrival_index);
 				for(int i = 0; i < N; i++) queuelength[i].add(queue[i]);
+				alpha[arrival_index] ++;
 			}
 			else if(min_arrival >= min_service ){ //退去が発生
 				System.out.println("Departure");
@@ -102,10 +104,8 @@ public class Jackson_lib {
 			System.out.println("Simulation : Arrival = "+Arrays.toString(arrival));
 			System.out.println("Simulation : Service = "+Arrays.toString(service));
 		}
-		//グラフ描画
-		Graph graph = new Graph(queuelength,N);
-		graph.setBounds(5,5,1000,600);
-		graph.setVisible(true);
+		for(int i = 0; i < N; i++) alpha[i] /= time;
+		System.out.println("Simulation : Alpha = "+Arrays.toString(alpha));
 		
 		for(int i = 0; i < N; i++) total_queue[i] = total_queue[i] / time;
 		return total_queue;
@@ -114,6 +114,10 @@ public class Jackson_lib {
 	public double getExponential(double param) {
 		if(param == 0) return 100;
 		else return - Math.log(1 - rnd.nextDouble()) / param;
+	}
+
+	public ArrayList<Integer>[] getQueuelength() {
+		return queuelength;
 	}
 	
 	
